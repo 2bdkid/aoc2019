@@ -3,7 +3,10 @@ pub type Fuel = i32;
 
 #[aoc_generator(day1)]
 pub fn input_generator(input: &str) -> Vec<Mass> {
-    input.lines().map(|line| line.trim().parse().unwrap()).collect()
+    input
+        .lines()
+        .map(|line| line.trim().parse().unwrap())
+        .collect()
 }
 
 #[aoc(day1, part1)]
@@ -24,4 +27,3 @@ fn total_module_fuel(m: Mass) -> Fuel {
 pub fn solve_part2(input: &[Mass]) -> Fuel {
     input.iter().map(|&m| total_module_fuel(m)).sum()
 }
-

@@ -29,11 +29,14 @@ impl FromStr for Path {
 
 #[aoc_generator(day3)]
 pub fn input_generator(input: &str) -> (Vec<Path>, Vec<Path>) {
-    let mut g: Vec<Vec<Path>> = input.lines()
-        .map(|l| l.trim()
-             .split(',')
-             .map(|p| Path::from_str(p).unwrap())
-             .collect())
+    let mut g: Vec<Vec<Path>> = input
+        .lines()
+        .map(|l| {
+            l.trim()
+                .split(',')
+                .map(|p| Path::from_str(p).unwrap())
+                .collect()
+        })
         .collect();
     (g.remove(0), g.remove(0))
 }
@@ -50,34 +53,46 @@ fn intersection(a: &Vec<Point>, b: &Vec<Point>) -> Vec<Point> {
 
 fn path_points(path: &Vec<Path>) -> Vec<Point> {
     let mut curr = Point { x: 0, y: 0 };
-    let mut points = vec![Point { x: 0, y: 0}];
-    
+    let mut points = vec![Point { x: 0, y: 0 }];
+
     for p in path {
         match p {
             Path::Up(n) => {
                 for _ in 0..*n {
                     curr.y += 1;
-                    points.push(Point { x: curr.x, y: curr.y });
+                    points.push(Point {
+                        x: curr.x,
+                        y: curr.y,
+                    });
                 }
-            },
+            }
             Path::Down(n) => {
                 for _ in 0..*n {
                     curr.y -= 1;
-                    points.push(Point { x: curr.x, y: curr.y });
+                    points.push(Point {
+                        x: curr.x,
+                        y: curr.y,
+                    });
                 }
-            },
+            }
             Path::Left(n) => {
                 for _ in 0..*n {
-                curr.x -= 1;                    
-                    points.push(Point { x: curr.x, y: curr.y });
+                    curr.x -= 1;
+                    points.push(Point {
+                        x: curr.x,
+                        y: curr.y,
+                    });
                 }
-            },
+            }
             Path::Right(n) => {
                 for _ in 0..*n {
                     curr.x += 1;
-                    points.push(Point { x: curr.x, y: curr.y });
+                    points.push(Point {
+                        x: curr.x,
+                        y: curr.y,
+                    });
                 }
-            },
+            }
         }
     }
 
@@ -90,7 +105,12 @@ pub fn solve_day1(input: &(Vec<Path>, Vec<Path>)) -> i32 {
     let (path1, path2) = (path_points(&path1), path_points(&path2));
     let intersection = intersection(&path1, &path2);
 
-    intersection.into_iter().filter(|p| *p != Point { x: 0, y: 0}).map(|Point {x, y}| x + y).min().unwrap()
+    intersection
+        .into_iter()
+        .filter(|p| *p != Point { x: 0, y: 0 })
+        .map(|Point { x, y }| x + y)
+        .min()
+        .unwrap()
 }
 
 fn steps_to(pt: Point, path: &Vec<Point>) -> i32 {
@@ -103,11 +123,11 @@ pub fn solve_day2(input: &(Vec<Path>, Vec<Path>)) -> i32 {
     let (path1, path2) = (path_points(&path1), path_points(&path2));
     let intersections = intersection(&path1, &path2);
 
-    intersections.iter()
-        .filter(|p| **p != Point {x: 0, y: 0})
+    intersections
+        .iter()
+        .filter(|p| **p != Point { x: 0, y: 0 })
         .map(|i| (steps_to(*i, &path1), steps_to(*i, &path2)))
         .map(|(a, b)| a + b)
         .min()
         .unwrap()
 }
-
