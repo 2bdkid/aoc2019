@@ -126,8 +126,7 @@ pub fn solve_day2(input: &(Vec<Path>, Vec<Path>)) -> i32 {
     intersections
         .iter()
         .filter(|p| **p != Point { x: 0, y: 0 })
-        .map(|i| (steps_to(*i, &path1), steps_to(*i, &path2)))
-        .map(|(a, b)| a + b)
+        .map(|i| steps_to(*i, &path1) + steps_to(*i, &path2))
         .min()
         .unwrap()
 }
