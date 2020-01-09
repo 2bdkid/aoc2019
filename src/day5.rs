@@ -14,7 +14,7 @@ pub enum Mode {
 
 impl TryFrom<i32> for Mode {
     type Error = String;
-    
+
     fn try_from(i: i32) -> Result<Mode, String> {
         match i {
             0 => Ok(Mode::Position),
@@ -39,7 +39,7 @@ pub enum Instruction {
 
 impl TryFrom<i32> for Instruction {
     type Error = String;
-    
+
     fn try_from(i: i32) -> Result<Instruction, String> {
         let a = (i / 10000) % 10;
         let b = (i / 1000) % 10;
@@ -49,14 +49,32 @@ impl TryFrom<i32> for Instruction {
 
         match (a, b, c, d, e) {
             (0, 0, 0, 9, 9) => Ok(Instruction::Halt),
-            (_, m2, m1, 0, 1) => Ok(Instruction::One(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
-            (_, m2, m1, 0, 2) => Ok(Instruction::Two(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, m2, m1, 0, 1) => Ok(Instruction::One(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
+            (_, m2, m1, 0, 2) => Ok(Instruction::Two(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
             (_, _, _, 0, 3) => Ok(Instruction::Three),
             (_, _, m1, 0, 4) => Ok(Instruction::Four(Mode::try_from(m1).unwrap())),
-            (_, m2, m1, 0, 5) => Ok(Instruction::Five(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
-            (_, m2, m1, 0, 6) => Ok(Instruction::Six(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
-            (_, m2, m1, 0, 7) => Ok(Instruction::Seven(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
-            (_, m2, m1, 0, 8) => Ok(Instruction::Eight(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),           
+            (_, m2, m1, 0, 5) => Ok(Instruction::Five(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
+            (_, m2, m1, 0, 6) => Ok(Instruction::Six(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
+            (_, m2, m1, 0, 7) => Ok(Instruction::Seven(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
+            (_, m2, m1, 0, 8) => Ok(Instruction::Eight(
+                Mode::try_from(m1).unwrap(),
+                Mode::try_from(m2).unwrap(),
+            )),
             _ => Err(format!("unknown instruction {}", i)),
         }
     }
@@ -87,25 +105,25 @@ impl Intcode {
                     let p3 = *self.memory.get(&(self.pc + 3)).unwrap();
                     self.memory.insert(p3 as usize, p1 + p2);
                     self.pc += 4;
-                },
+                }
                 Instruction::Two(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
                     let p2 = self.value(m2, *self.memory.get(&(self.pc + 2)).unwrap());
                     let p3 = *self.memory.get(&(self.pc + 3)).unwrap();
                     self.memory.insert(p3 as usize, p1 * p2);
                     self.pc += 4;
-                },
+                }
                 Instruction::Three => {
                     let p1 = *self.memory.get(&(self.pc + 1)).unwrap();
                     self.memory.insert(p1 as usize, input);
                     self.pc += 2;
-                },
+                }
                 Instruction::Four(m) => {
                     let p1 = self.value(m, *self.memory.get(&(self.pc + 1)).unwrap());
                     println!("{}", p1);
                     self.diagnostic = Some(p1);
                     self.pc += 2;
-                },
+                }
                 Instruction::Five(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
                     let p2 = self.value(m2, *self.memory.get(&(self.pc + 2)).unwrap());
@@ -115,7 +133,7 @@ impl Intcode {
                     } else {
                         self.pc += 3;
                     }
-                },
+                }
                 Instruction::Six(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
                     let p2 = self.value(m2, *self.memory.get(&(self.pc + 2)).unwrap());
@@ -125,7 +143,7 @@ impl Intcode {
                     } else {
                         self.pc += 3;
                     }
-                },
+                }
                 Instruction::Seven(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
                     let p2 = self.value(m2, *self.memory.get(&(self.pc + 2)).unwrap());
@@ -138,7 +156,7 @@ impl Intcode {
                     }
 
                     self.pc += 4;
-                },
+                }
                 Instruction::Eight(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
                     let p2 = self.value(m2, *self.memory.get(&(self.pc + 2)).unwrap());
@@ -151,7 +169,7 @@ impl Intcode {
                     }
 
                     self.pc += 4;
-                },
+                }
             }
         }
     }
