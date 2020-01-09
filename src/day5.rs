@@ -6,7 +6,7 @@ pub fn input_generator(input: &str) -> Vec<i32> {
     input.split(',').map(|s| s.parse().unwrap()).collect()
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub enum Mode {
     Position,
     Immediate,
@@ -22,7 +22,7 @@ impl From<i32> for Mode {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub enum Instruction {
     One(Mode, Mode),
     Two(Mode, Mode),
