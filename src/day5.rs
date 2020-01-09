@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::convert::From;
+use std::convert::TryFrom;
 
 #[aoc_generator(day5)]
 pub fn input_generator(input: &str) -> Vec<i32> {
@@ -12,12 +12,14 @@ pub enum Mode {
     Immediate,
 }
 
-impl From<i32> for Mode {
-    fn from(i: i32) -> Mode {
+impl TryFrom<i32> for Mode {
+    type Error = String;
+    
+    fn try_from(i: i32) -> Result<Mode, String> {
         match i {
-            0 => Mode::Position,
-            1 => Mode::Immediate,
-            _ => panic!(format!("unknown mode: {}", i)),
+            0 => Ok(Mode::Position),
+            1 => Ok(Mode::Immediate),
+            _ => Err(format!("unknown mode: {}", i)),
         }
     }
 }
@@ -35,8 +37,10 @@ pub enum Instruction {
     Halt,
 }
 
-impl From<i32> for Instruction {
-    fn from(i: i32) -> Instruction {
+impl TryFrom<i32> for Instruction {
+    type Error = String;
+    
+    fn try_from(i: i32) -> Result<Instruction, String> {
         let a = (i / 10000) % 10;
         let b = (i / 1000) % 10;
         let c = (i / 100) % 10;
@@ -44,16 +48,16 @@ impl From<i32> for Instruction {
         let e = i % 10;
 
         match (a, b, c, d, e) {
-            (0, 0, 0, 9, 9) => Instruction::Halt,
-            (_, m2, m1, 0, 1) => Instruction::One(Mode::from(m1), Mode::from(m2)),
-            (_, m2, m1, 0, 2) => Instruction::Two(Mode::from(m1), Mode::from(m2)),
-            (_, _, _, 0, 3) => Instruction::Three,
-            (_, _, m1, 0, 4) => Instruction::Four(Mode::from(m1)),
-            (_, m2, m1, 0, 5) => Instruction::Five(Mode::from(m1), Mode::from(m2)),
-            (_, m2, m1, 0, 6) => Instruction::Six(Mode::from(m1), Mode::from(m2)),
-            (_, m2, m1, 0, 7) => Instruction::Seven(Mode::from(m1), Mode::from(m2)),
-            (_, m2, m1, 0, 8) => Instruction::Eight(Mode::from(m1), Mode::from(m2)),            
-            _ => panic!(format!("unknown instruction {}", i)),
+            (0, 0, 0, 9, 9) => Ok(Instruction::Halt),
+            (_, m2, m1, 0, 1) => Ok(Instruction::One(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, m2, m1, 0, 2) => Ok(Instruction::Two(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, _, _, 0, 3) => Ok(Instruction::Three),
+            (_, _, m1, 0, 4) => Ok(Instruction::Four(Mode::try_from(m1).unwrap())),
+            (_, m2, m1, 0, 5) => Ok(Instruction::Five(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, m2, m1, 0, 6) => Ok(Instruction::Six(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, m2, m1, 0, 7) => Ok(Instruction::Seven(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),
+            (_, m2, m1, 0, 8) => Ok(Instruction::Eight(Mode::try_from(m1).unwrap(), Mode::try_from(m2).unwrap())),           
+            _ => Err(format!("unknown instruction {}", i)),
         }
     }
 }
@@ -75,7 +79,7 @@ impl Intcode {
 
     fn run(&mut self, input: i32) {
         loop {
-            match Instruction::from(*self.memory.get(&self.pc).unwrap()) {
+            match Instruction::try_from(*self.memory.get(&self.pc).unwrap()).unwrap() {
                 Instruction::Halt => break,
                 Instruction::One(m1, m2) => {
                     let p1 = self.value(m1, *self.memory.get(&(self.pc + 1)).unwrap());
