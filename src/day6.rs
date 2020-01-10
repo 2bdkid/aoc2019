@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub type Tree = HashMap<String, String>;
 
@@ -26,8 +27,24 @@ fn depth(node: &String, tree: &Tree) -> i32 {
 
 #[aoc(day6, part1)]
 pub fn solve_part1(input: &Tree) -> i32 {
-    input
-        .keys()
-        .map(|child| depth(child, input))
-        .sum()
+    input.keys().map(|child| depth(child, input)).sum()
+}
+
+fn path_to_com(node: &String, tree: &Tree) -> HashSet<String> {
+    let mut node = node;
+    let mut path = HashSet::new();
+
+    while let Some(parent) = tree.get(node) {
+        path.insert(parent.clone());
+        node = parent;
+    }
+
+    path
+}
+
+#[aoc(day6, part2)]
+pub fn solve_part2(input: &Tree) -> i32 {
+    let your_path = path_to_com(&String::from("YOU"), input);
+    let santas_path = path_to_com(&String::from("SAN"), input);
+    your_path.symmetric_difference(&santas_path).count() as i32
 }
