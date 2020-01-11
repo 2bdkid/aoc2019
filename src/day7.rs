@@ -120,13 +120,8 @@ impl Intcode {
                 }
                 Instruction::Three => {
                     let p1 = *self.memory.get(&(self.pc + 1)).unwrap();
-
-                    if let Some(input) = bus.pop_front() {
-                        self.memory.insert(p1 as usize, input);
-                        self.pc += 2;
-                    } else {
-                        break; // wait for input
-                    }
+                    self.memory.insert(p1 as usize, bus.pop_front().unwrap());
+                    self.pc += 2;
                 }
                 Instruction::Four(m) => {
                     let p1 = self.value(m, *self.memory.get(&(self.pc + 1)).unwrap());
